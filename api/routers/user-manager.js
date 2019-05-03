@@ -2,15 +2,14 @@ const Router = require('express').Router()
 const requestAdapter = require('../helper/request-adapter')
 
 const userController = require('../controller/user.controller')
-const { validateBody } = require('../models/user.validator')
+const { userSchema } = require('../models/user.validator')
+
+// Importing the validator data midd
+const validatorMid = require('../helper/data-validator')
 
 Router.post(
     '/',
-    (req, res, next) => {
-        validateBody(req.body)
-            .then(data => { next() })
-            .catch(err => res.send(err).end())
-    },
+    validatorMid(userSchema),
     (req, res) => {
         userController.createUser(requestAdapter(req))
             .then(data => {

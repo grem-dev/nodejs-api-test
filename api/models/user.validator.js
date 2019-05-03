@@ -7,10 +7,6 @@ const userSchema = Joi.object({
 })
 
 
-function validateBody(body) {
-    return userSchema.validateAsync(body);
-}
-
 module.exports = {
-    validateBody
+    userSchema
 }
