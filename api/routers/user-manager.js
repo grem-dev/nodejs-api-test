@@ -1,10 +1,16 @@
 const Router = require('express').Router()
-const requestAdapter = require('../libs/request-adapter')
+const requestAdapter = require('../helper/request-adapter')
 
 const userController = require('../controller/user.controller')
+const { validateBody } = require('../models/user.validator')
 
 Router.post(
     '/',
+    (req, res, next) => {
+        validateBody(req.body)
+            .then(data => { next() })
+            .catch(err => res.send(err).end())
+    },
     (req, res) => {
         userController.createUser(requestAdapter(req))
             .then(data => {

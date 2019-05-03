@@ -2,8 +2,8 @@
 const userManager = require('./routers/user-manager')
 const notesManager = require('./routers/notes-manager')
 
-//Example ['/admin', adminEndPoint]
+//Example ['/admin', middleware? ,adminEndPoint]
 module.exports = [
     ['/user-manager', userManager],
-    ['/', notesManager]
+    ['/notes-manager', notesManager]
 ]
