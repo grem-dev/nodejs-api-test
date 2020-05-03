@@ -7,9 +7,7 @@ const { userSchema } = require('../models/user.validator')
 // Importing the validator data midd
 const validatorMid = require('../helper/data-validator')
 
-Router.post(
-    '/',
-    validatorMid(userSchema),
+Router.post('/', validatorMid(userSchema),
     (req, res) => {
         userController.createUser(requestAdapter(req))
             .then(data => {
@@ -21,8 +19,7 @@ Router.post(
     }
 )
 
-Router.post(
-    '/',
+Router.post('/',
     (req, res) => {
         userController.createUser(requestAdapter(req))
             .then(data => {
