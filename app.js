@@ -14,9 +14,31 @@ const app = new Server({ port: config.port })
 
 app.setMiddleware(bodyParser.json());
 app.setMiddleware(bodyParser.urlencoded({ extended: true }));
+app.setMiddleware(require('cors')());
+
+// Developing configuration
+if (config.NODE_ENV === 'development') {
+    app.setMiddleware(require('morgan')('dev'))
+}
 
 // Setting the router
 app.setRouter({ prefix: '/api/v0', routes: require('./api/router.js') })
+
+
+
+/**
+ * Error handler callback
+ */
+app.setMiddleware((err, req, res, next) => {
+    res.status(err.status || 500);
+    res.json({
+        'errors': {
+            message: err.message,
+            error: {}
+        }
+    })
+})
+
 
 /**
  * TODO: I need to configure a handler that only return a file

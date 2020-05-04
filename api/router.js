@@ -5,5 +5,5 @@ const notesManager = require('./routers/notes-manager')
 //Example ['/admin', middleware? ,adminEndPoint]
 module.exports = [
     ['/user-manager', userManager],
-    ['/notes-manager', notesManager]
+    ['/note-manager', notesManager]
 ]

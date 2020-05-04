@@ -5,6 +5,7 @@
 
 
 module.exports = {
+    NODE_ENV: 'development',
     port: process.env.PORT || 3001,
     db1: process.env.MONGODB_URI || 'mongodb://localhost:27017/test2',
     SECRET_TOKEN: 'claveMasComplejaParaCifradoDelToken'
