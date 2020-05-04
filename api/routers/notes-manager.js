@@ -15,6 +15,13 @@ Router.get(
     '/:id',
     NoteManager.getById
 )
+
+// To delete one note by using an Id
+Router.delete(
+    '/:id',
+    NoteManager.deleteById
+)
+
 // To create a new note
 Router.post(
     '/',

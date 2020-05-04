@@ -6,10 +6,12 @@ const NoteModel = require('../../models/notes/note.model')
 
 
 const createNewNote = (req, res, next) => {
+
     const note = new NoteModel();
     note.content = req.body.content;
     note.save().then(function () {
-        return res.json({ user: note.toJSON() });
+        let payload = note.toJSON()
+        return res.json(payload);
     }).catch(next);
 }
 
@@ -26,10 +28,18 @@ const getById = function (req, res, next) {
 }
 
 
+const deleteById = function (req, res, next) {
+    NoteModel.deleteOne({ _id: req.params.id }).then(function () {
+        return res.json({});
+    }).catch(next);
+}
+
+
 
 
 module.exports = {
     createNewNote,
     getAllNotes,
-    getById
+    getById,
+    deleteById
 }
