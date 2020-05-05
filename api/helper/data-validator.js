@@ -8,7 +8,12 @@ module.exports = (schema) => {
                 next()
             })
             .catch(err => {
-                res.json(err).end()
+                console.log(err)
+                next({
+                    message: err.details[0].message,
+                    type: err.details.type,
+                    status: 400
+                })
             })
     }
 }

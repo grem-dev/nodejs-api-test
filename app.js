@@ -30,13 +30,9 @@ app.setRouter({ prefix: '/api/v0', routes: require('./api/router.js') })
  * Error handler callback
  */
 app.setMiddleware((err, req, res, next) => {
+
     res.status(err.status || 500);
-    res.json({
-        'errors': {
-            message: err.message,
-            error: {}
-        }
-    })
+    res.json({ error: { message: err.message }, status: err.status })
 })
 
 
