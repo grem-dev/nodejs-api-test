@@ -8,7 +8,13 @@ const UserModel = require('../../models/user/user.model')
 
 
 
-
+/**
+ * Create a new user and save onto the database.
+ * Then return the user data and a new token to login 
+ * @param Username The user name for the account
+ * @param Password Original password to be hased
+ * @param Email A valid email 
+ */
 function createNewUser({ username, password, email }) {
     return new Promise((resolve, reject) => {
         const newUser = new UserModel();
@@ -18,12 +24,12 @@ function createNewUser({ username, password, email }) {
 
         bcrypt.hash(password, 10).then((pass) => {
             newUser.password = pass;
-
             UserModel.findOne({ email }, (err, user) => {
                 if (err) reject(err)
                 if (user) reject({ message: 'Email already in use' })
 
                 newUser.save().then(() => {
+                    // We generate a new token to login the user automatically
                     const token = jwt.sign({ ...newUser.toJSON(), sessionDate: new Date() }, config.SECRET_TOKEN);
                     resolve({ ...(newUser.toJSON()), token })
                 }).catch(err => {
