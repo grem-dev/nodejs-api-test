@@ -36,5 +36,14 @@ userSchema.methods.toJSON = function () {
     })
 }
 
+userSchema.methods.toSignToken = function () {
+    return Object.freeze({
+        username: this.username,
+        email: this.email,
+        _id: this._id,
+        sessionDate: new Date()
+    })
+}
+
 
 module.exports = mongoose.model('User', userSchema)

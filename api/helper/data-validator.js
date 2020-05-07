@@ -8,6 +8,7 @@ module.exports = (schema) => {
                 next()
             })
             .catch(err => {
+                console.log('Data validator')
                 console.log(err)
                 next({
                     message: err.details[0].message,

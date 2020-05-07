@@ -1,37 +1,40 @@
-const mongoose = require('mongoose')
 
-// const NoteModel = mongoose.model('Note')
-const NoteModel = require('../../models/notes/note.model')
-
-
+const NoteServices = require('../../services/NoteServices')
 
 const createNewNote = (req, res, next) => {
-
-    const note = new NoteModel();
-    note.content = req.body.content;
-    note.save().then(function () {
-        let payload = note.toJSON()
-        return res.json(payload);
-    }).catch(next);
+    NoteServices.createNote({ content: req.body.content }, (err, note) => {
+        if (err) next({ message: err.message, status: 500 });
+        res.status(200).json({ data: note })
+    })
 }
+
 
 const getAllNotes = function (req, res, next) {
-    NoteModel.find().then(function (notes) {
-        return res.json({ notes: notes.map(item => item.toJSON()) });
-    }).catch(next);
+
+    NoteServices.listNotes({}, (err, notes) => {
+        if (err) next({ err })
+        res.status(200).json(notes)
+    });
 }
 
+
 const getById = function (req, res, next) {
-    NoteModel.findById(req.params.id).then(function (note) {
-        return res.json({ data: note });
-    }).catch(next);
+
+    NoteServices.getOneById({ id: req.params.id }, (err, note) => {
+        // If there is an error or the user is not found return 404
+        if (err || !note) return next(err || { status: 404 })
+
+        res.status(200).json({ data: note, status: 200 }).end()
+    })
 }
 
 
 const deleteById = function (req, res, next) {
-    NoteModel.deleteOne({ _id: req.params.id }).then(function () {
-        return res.json({});
-    }).catch(next);
+
+    NoteServices.deleteById({ id: req.params.id }, (err) => {
+        if (err) return next({ status: 400 });
+        res.status(200).json({ data: { id: req.params.id } }).end()
+    })
 }
 
 

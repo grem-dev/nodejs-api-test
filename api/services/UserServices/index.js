@@ -15,70 +15,85 @@ const UserModel = require('../../models/user/user.model')
  * @param Password Original password to be hased
  * @param Email A valid email 
  */
-function createNewUser({ username, password, email }) {
-    return new Promise((resolve, reject) => {
-        const newUser = new UserModel();
+const createNewUser = ({ username, password, email }) => new Promise((resolve, reject) => {
+    const newUser = new UserModel();
 
-        newUser.username = username;
-        newUser.email = email;
+    newUser.username = username;
+    newUser.email = email;
 
-        bcrypt.hash(password, 10).then((pass) => {
-            newUser.password = pass;
-            UserModel.findOne({ email }, (err, user) => {
-                if (err) reject(err)
-                if (user) reject({ message: 'Email already in use' })
+    bcrypt.hash(password, 10).then((pass) => {
+        newUser.password = pass;
+        UserModel.findOne({ email }, (err, user) => {
+            if (err) reject(err)
+            if (user) reject({ message: 'Email already in use' })
 
-                newUser.save().then(() => {
-                    // We generate a new token to login the user automatically
-                    const token = jwt.sign({ ...newUser.toJSON(), sessionDate: new Date() }, config.SECRET_TOKEN);
-                    resolve({ ...(newUser.toJSON()), token })
-                }).catch(err => {
-                    reject(err)
-                })
+            newUser.save().then(() => {
+                // We generate a new token to login the user automatically
+                const token = jwt.sign({ ...newUser.toJSON(), sessionDate: new Date() }, config.SECRET_TOKEN);
+                resolve({ ...(newUser.toJSON()), token })
+            }).catch(err => {
+                reject(err)
             })
         })
-    }) // End of the promise
-}
-
-function getOne({ id }) {
-    return new Promise((resolve, reject) => {
-        UserModel.findById(id)
-            .then(data => resolve(data))
-            .catch(err => {
-                reject(null)
-            })
     })
-}
+})
+
+
+
+const getOne = ({ id }) => new Promise((resolve, reject) => {
+    UserModel.findById(id)
+        .then(data => resolve(data))
+        .catch(err => {
+            reject(null)
+        })
+})
+
+
 
 const getSelfInfo = (token) => new Promise(async (resolve, reject) => {
 
     const payload = await jwt.decode(token, { json: true })
+    if (payload == null) return reject(new Error('Invalid credentials'))
 
     UserModel.findById(payload._id, (err, user) => {
         if (err) reject({ message: 'User not exist' });
-
-        resolve(user.toJSON())
+        if (user == null) reject({ message: 'User not exist' });
+        resolve({ ...user.toJSON() })
     })
 })
 
-function login({ email, password }) {
-    return new Promise(async (resolve, reject) => {
-        UserModel.findOne({ email }, async (err, user) => {
-            if (err) reject(err);
-            const res = await bcrypt.compareSync(password, user.password)
-            if (res === false) reject(new Error('Invalid credentials'))
-            const token = jwt.sign({ ...user.toJSON(), sessionDate: new Date() }, config.SECRET_TOKEN);
-            resolve({ token });
-        })
+
+const login = ({ email, password }) => new Promise(async (resolve, reject) => {
+    console.log(email, password)
+    UserModel.findOne({ email }, async (err, user) => {
+        console.log(user)
+        if (err) reject(err);
+        if (!user) return reject(new Error('Invalid credentials'))
+
+        const res = await bcrypt.compareSync(password, user.password)
+        if (res === false) reject(new Error('Invalid credentials'))
+
+        // Then all is correct, we return the token
+        const token = jwt.sign({ ...user.toSignToken() }, config.SECRET_TOKEN);
+        resolve({ token, ...user.toJSON() });
     })
-}
+})
 
 
+const validateSesion = ({ token }) => new Promise((resolve, reject) => {
+    const payload = jwt.decode(token, config.SECRET_TOKEN)
+    UserModel.findById(payload._id, (err, user) => {
+        if (err) reject(false)
+        if (!user) reject(new Error('Invalid credentials'))
 
+        resolve({ ...payload, token })
+    }).catch(err => reject(err))
+})
 
 module.exports = {
     createNewUser,
     getOne,
     login,
-    getSelfInfo
+    getSelfInfo,
+    validateSesion
 }

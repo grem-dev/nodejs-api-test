@@ -9,7 +9,11 @@ const noteSchema = mongoose.Schema({
     },
     tags: [{
         type: String,
-    }]
+    }],
+    createAt: {
+        type: String,
+        default: new Date(),
+    },
 })
 
 
@@ -17,7 +21,8 @@ noteSchema.methods.toJSON = function () {
     return Object.freeze({
         content: this.content,
         tags: this.tags,
-        _id: this._id
+        _id: this._id,
+        createAt: this.createAt
     })
 }
 
