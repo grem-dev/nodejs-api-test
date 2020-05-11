@@ -2,7 +2,9 @@
 const NoteServices = require('../../services/NoteServices')
 
 const createNewNote = (req, res, next) => {
-    NoteServices.createNote({ content: req.body.content }, (err, note) => {
+
+    const { _id } = req.headers.token
+    NoteServices.createNote({ content: req.body.content, userId: _id }, (err, note) => {
         if (err) next({ message: err.message, status: 500 });
         res.status(200).json({ data: note })
     })
@@ -10,8 +12,8 @@ const createNewNote = (req, res, next) => {
 
 
 const getAllNotes = function (req, res, next) {
-
-    NoteServices.listNotes({}, (err, notes) => {
+    const { _id } = req.headers.token
+    NoteServices.listNotes({ userId: _id }, (err, notes) => {
         if (err) next({ err })
         res.status(200).json(notes)
     });

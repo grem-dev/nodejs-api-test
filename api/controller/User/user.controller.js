@@ -31,13 +31,9 @@ function getUser(req, res, next) {
 }
 
 /**
- * Create a new user Session or validate one
+ * Create a new user Session or validate one session
  */
 function loginUser(req, res, next) {
-
-    console.log('Ando acá')
-    console.log(req.headers)
-    console.log(req.body)
 
     if (req.headers.validate) {
         UserServices.validateSesion({ token: req.headers.token })
@@ -58,10 +54,13 @@ function loginUser(req, res, next) {
     }
 }
 
-
+/**
+ * Get the self user session via using the token 
+ */
 function getSelfInfo(req, res, next) {
     const token = req.headers.token;
     if (!token) return next({ status: 400, message: 'Token not provided' })
+    
     UserServices.getSelfInfo(token)
         .then(data => res.status(200).json(data).end())
         .catch(err => next({ message: err.message, status: 400 }))

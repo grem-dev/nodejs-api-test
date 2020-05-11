@@ -14,6 +14,15 @@ const noteSchema = mongoose.Schema({
         type: String,
         default: new Date(),
     },
+    access: {
+        type: String,
+        enum: ['public', 'private', 'friends'],
+        default: 'private'
+    },
+    userId: {
+        type: mongoose.Types.ObjectId,
+        required: true
+    }
 })
 
 
@@ -22,7 +31,8 @@ noteSchema.methods.toJSON = function () {
         content: this.content,
         tags: this.tags,
         _id: this._id,
-        createAt: this.createAt
+        createAt: this.createAt,
+        access: this.access,
     })
 }
 

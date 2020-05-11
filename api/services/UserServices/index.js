@@ -29,12 +29,12 @@ const createNewUser = ({ username, password, email }) => new Promise((resolve, r
 
             newUser.save().then(() => {
                 // We generate a new token to login the user automatically
-                const token = jwt.sign({ ...newUser.toJSON(), sessionDate: new Date() }, config.SECRET_TOKEN);
+                const token = jwt.sign({ ...newUser.toJSON(), sessionDate: new Date() }, config.SECRET_TOKEN, { expiresIn: '30d' });
                 resolve({ ...(newUser.toJSON()), token })
             }).catch(err => {
                 reject(err)
             })
-        })
+        }) // End find one method
     })
 })
 
@@ -52,10 +52,7 @@ const getOne = ({ id }) => new Promise((resolve, reject) => {
 
 const getSelfInfo = (token) => new Promise(async (resolve, reject) => {
 
-    const payload = await jwt.decode(token, { json: true })
-    if (payload == null) return reject(new Error('Invalid credentials'))
-
-    UserModel.findById(payload._id, (err, user) => {
+    UserModel.findById(token._id, (err, user) => {
         if (err) reject({ message: 'User not exist' });
         if (user == null) reject({ message: 'User not exist' });
         resolve({ ...user.toJSON() })
@@ -64,18 +61,18 @@ const getSelfInfo = (token) => new Promise(async (resolve, reject) => {
 
 
 const login = ({ email, password }) => new Promise(async (resolve, reject) => {
-    console.log(email, password)
+
     UserModel.findOne({ email }, async (err, user) => {
-        console.log(user)
-        if (err) reject(err);
+        if (err) return reject(err)
+
         if (!user) return reject(new Error('Invalid credentials'))
 
         const res = await bcrypt.compareSync(password, user.password)
         if (res === false) reject(new Error('Invalid credentials'))
 
-        // Then all is correct, we return the token
-        const token = jwt.sign({ ...user.toSignToken() }, config.SECRET_TOKEN);
-        resolve({ token, ...user.toJSON() });
+        // Then all is correct, we return a new token
+        const token = jwt.sign({ ...user.toSignToken() }, config.SECRET_TOKEN, { expiresIn: '30d' })
+        resolve({ token, ...user.toJSON() })
     })
 })
 
@@ -83,10 +80,10 @@ const login = ({ email, password }) => new Promise(async (resolve, reject) => {
 const validateSesion = ({ token }) => new Promise((resolve, reject) => {
     const payload = jwt.decode(token, config.SECRET_TOKEN)
     UserModel.findById(payload._id, (err, user) => {
-        if (err) reject(false)
-        if (!user) reject(new Error('Invalid credentials'))
+        if (err) return reject(false)
+        if (!user) return reject(new Error('Invalid credentials'))
 
-        resolve({ ...payload, token })
+        return resolve({ ...payload, token })
     }).catch(err => reject(err))
 })
 

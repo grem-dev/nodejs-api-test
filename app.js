@@ -1,20 +1,19 @@
-const Server = require('./api/architecture/express.server');
-const dotenv = require('dotenv')
+const Server = require('./api/architecture/express.server')
+const express = require('express')
+const dotenv = require('dotenv').config()
 const bodyParser = require('body-parser')
-dotenv.config()
-/**It is important to call this after run dotenv.config()
- * otherwise the enviroment vars will not be available to use
- * when we call this configuration file
- */
 const config = require('./config');
-
+const path = require('path')
+const os = require('os')
 
 // Starting a new server instance
 const app = new Server({ port: config.port })
 
-app.setMiddleware(bodyParser.json());
-app.setMiddleware(bodyParser.urlencoded({ extended: true }));
-app.setMiddleware(require('cors')());
+app
+    .setMiddleware(bodyParser.json())
+    .setMiddleware(bodyParser.urlencoded({ extended: true }))
+    .setMiddleware(require('cors')())
+    .setMiddleware(express.static(path.join(__dirname, '/public')))
 
 // Developing configuration
 if (config.NODE_ENV === 'development') {
@@ -23,7 +22,6 @@ if (config.NODE_ENV === 'development') {
 
 // Setting the router
 app.setRouter({ prefix: '/api/v0', routes: require('./api/router.js') })
-
 
 
 /**

@@ -16,13 +16,13 @@ class Server {
         routes.forEach(item => {
             let aux = [...item]
             if (new RegExp('^/[a-zA-Z-/]*[a-z][0-9]*$').test(prefix)) aux[0] = (prefix + item[0])
-            // console.log(aux)
             this.app.use(...aux)
         })
         return this
     }
 
     setMiddleware(midle) {
+        if(typeof midle !== 'function') return this
         this.app.use(midle)
         return this
     }

@@ -3,10 +3,31 @@ const requestAdapter = require('../helper/request-adapter')
 
 // Importing controllers
 const NoteManager = require('../controller/Note/note-controller')
+const { isAuth } = require('../middleware')
+/**
+ * Thus we can tell at the route the specific middlewares
+ * if the route needs Autorization or not.
+ */
+
+
+
+// To create a new note
+Router.post(
+    '/',
+    isAuth,
+    NoteManager.createNewNote
+)
 
 // To get all the notes
 Router.get(
     '/',
+    isAuth,
+    NoteManager.getAllNotes
+)
+
+// To get all the notes
+Router.get(
+    '/self',
     NoteManager.getAllNotes
 )
 
@@ -19,14 +40,10 @@ Router.get(
 // To delete one note by using an Id
 Router.delete(
     '/:id',
+    isAuth,
     NoteManager.deleteById
 )
 
-// To create a new note
-Router.post(
-    '/',
-    NoteManager.createNewNote
-)
 
 
 
