@@ -1,11 +1,20 @@
 
 const NoteServices = require('../../services/NoteServices')
+const StorageService = require('../../services/StorageService')
 
-const createNewNote = (req, res, next) => {
+
+const createNewNote = async (req, res, next) => {
+
+
+    let filesInfo = []
+    if (req.files) {
+        filesInfo = await StorageService.saveFiles(req.files)
+    }
+
 
     const { _id } = req.headers.token
-    NoteServices.createNote({ content: req.body.content, userId: _id }, (err, note) => {
-        if (err) next({ message: err.message, status: 500 });
+    NoteServices.createNote({ content: req.body.content, userId: _id, filesInfo }, (err, note) => {
+        if (err) return next({ message: err.message, status: 400 });
         res.status(200).json({ data: note })
     })
 }

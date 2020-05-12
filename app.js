@@ -4,15 +4,24 @@ const dotenv = require('dotenv').config()
 const bodyParser = require('body-parser')
 const config = require('./config');
 const path = require('path')
-const os = require('os')
+const multer = require('multer')
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'public/files')
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + '-' + file.originalname)
+    }
+})
 
 // Starting a new server instance
 const app = new Server({ port: config.port })
 
 app
+    .setMiddleware(require('cors')())
     .setMiddleware(bodyParser.json())
     .setMiddleware(bodyParser.urlencoded({ extended: true }))
-    .setMiddleware(require('cors')())
     .setMiddleware(express.static(path.join(__dirname, '/public')))
 
 // Developing configuration

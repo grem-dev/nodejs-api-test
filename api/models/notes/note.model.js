@@ -22,7 +22,12 @@ const noteSchema = mongoose.Schema({
     userId: {
         type: mongoose.Types.ObjectId,
         required: true
-    }
+    },
+    files: [{
+        fileName: String,
+        fileType: String,
+        uri: String
+    }]
 })
 
 
@@ -33,8 +38,10 @@ noteSchema.methods.toJSON = function () {
         _id: this._id,
         createAt: this.createAt,
         access: this.access,
+        files: this.files,
     })
 }
+
 
 
 module.exports = mongoose.model('Note', noteSchema)

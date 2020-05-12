@@ -9,12 +9,13 @@ const { isAuth } = require('../middleware')
  * if the route needs Autorization or not.
  */
 
-
+const multer = require('multer')
 
 // To create a new note
 Router.post(
     '/',
     isAuth,
+    multer().array('arch'),
     NoteManager.createNewNote
 )
 

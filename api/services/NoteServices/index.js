@@ -5,11 +5,21 @@ const NoteModel = require('../../models/notes/note.model')
 
 
 
-const createNote = ({ content, userId, access, images, video }, cb) => {
+const createNote = ({ content, userId, access, filesInfo = [] }, cb) => {
     const note = new NoteModel();
     note.content = content;
     note.userId = userId;
     note.access = access ? access : 'private'
+
+    filesInfo.forEach(item => {
+        let file = {
+            fileName: item.name,
+            uri: item.uri,
+            fileType: item.type
+        }
+        note.files.push(file)
+    })
+
     note.save().then(function () {
         let payload = note.toJSON()
         cb(undefined, payload)
